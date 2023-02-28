@@ -1,0 +1,39 @@
+from rest_framework import serializers
+from .models import TodoList
+
+
+
+
+
+class TodoListSerializer(serializers.Serializer):
+    id = serializers.IntegerField(read_only = True)
+    name = serializers.CharField(allow_null=False, allow_blank=False)
+
+
+    def create(self, validated_data):
+        todo_list = TodoList(**validated_data)
+        todo_list.save()
+        return todo_list
+
+
+    def update(self, instance, validated_data):
+        instance.name = validated_data.get('name')
+        instance.save()
+        return instance
+    
+class TodoSerializer(serializers.Serializer):
+    id = serializers.IntegerField(read_only=True)
+    name = serializers.CharField(allow_null=False, allow_blank=False)
+    todo_list = TodoListSerializer(allow_null=False, read_only=True)
+    todo_list_id = serializers.IntegerField(write_only=True)
+
+    def create(self, validated_data):
+        todo = Todo(**validated_data)
+        todo.save()
+        return todo
+    
+    def update(self,instance, validated_data):
+        instance.name = validated_data.get('name')
+        instance.todo_list_id = validated_data.get('todo_list_id')
+        instance.save()
+        return instance
